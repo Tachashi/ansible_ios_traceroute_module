@@ -1,0 +1,33 @@
+---
+
+- hosts: cisco
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+    - name: execute traceroute
+      ios_traceroute:
+        dest: 172.217.25.238
+        probe: 4
+        source: 192.168.100.201
+        ttl_min: 1
+        ttl_max: 20
+      register: result_traceroute
+
+    - name: debug traceroute
+      debug: 
+        msg: "{{ result_traceroute }}"
+
+    - name: check if the traceroute results always include specific transit ip address in hop 7
+      assert: 
+        that:
+            - result_traceroute.hop[6][0] == '7'
+            - result_traceroute.hop[6][1] == '72.14.202.237'
+            - result_traceroute.hop[6][2] is not defined
+
+
+
+
+
+
+
