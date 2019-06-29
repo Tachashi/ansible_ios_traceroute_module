@@ -12,7 +12,7 @@ Ansible ios_traceroute module for Cisco IOS
   tasks:
     - name: execute traceroute
       ios_traceroute:
-        dest: 172.217.25.238
+        dest: 172.16.1.100
         probe: 4
         source: 192.168.100.201
         ttl_min: 1
@@ -26,7 +26,7 @@ Ansible ios_traceroute module for Cisco IOS
 
 # Sample Result
 
-IP adress is anonymized, not acutual data.
+**All IP addresses are anonymized, so dest IP address does not coincide with the playbook.**  
 
 ```yaml
 PLAY [cisco] **************************************************************************************************
