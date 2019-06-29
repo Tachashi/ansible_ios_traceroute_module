@@ -22,6 +22,13 @@ Ansible ios_traceroute module for Cisco IOS
     - name: debug traceroute
       debug: 
         msg: "{{ result_traceroute }}"
+        
+    - name: check if the traceroute results always include specific transit ip address in hop 7
+      assert: 
+        that:
+            - result_traceroute.hop[6][0] == '7'
+            - result_traceroute.hop[6][1] == '72.31.100.1'
+            - result_traceroute.hop[6][2] is not defined
 ```
 
 # Sample Result
@@ -156,4 +163,13 @@ ok: [192.168.100.201] => {
         ]
     }
 }
+
+TASK [check if the traceroute results always include specific transit ip address in hop 7] ********************
+ok: [192.168.100.201] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+PLAY RECAP ****************************************************************************************************
+192.168.151.3            : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
