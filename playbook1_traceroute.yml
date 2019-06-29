@@ -7,7 +7,7 @@
   tasks:
     - name: execute traceroute
       ios_traceroute:
-        dest: 172.217.25.238
+        dest: 172.16.1.100
         probe: 4
         source: 192.168.100.201
         ttl_min: 1
@@ -22,7 +22,7 @@
       assert: 
         that:
             - result_traceroute.hop[6][0] == '7'
-            - result_traceroute.hop[6][1] == '72.14.202.237'
+            - result_traceroute.hop[6][1] == '172.30.100.1'
             - result_traceroute.hop[6][2] is not defined
 
 
