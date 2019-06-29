@@ -33,7 +33,7 @@ Ansible ios_traceroute module for Cisco IOS
 
 # Sample Result
 
-**All IP addresses are anonymized, so some IP addresses don't coincide with the playbook.**  
+**All IP addresses are anonymized using [Netconan](https://github.com/intentionet/netconan), so some IP addresses don't coincide with the playbook.**  
 
 ```yaml
 PLAY [cisco] **************************************************************************************************
