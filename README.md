@@ -26,13 +26,13 @@ Ansible ios_traceroute module for Cisco IOS
     - name: check if the traceroute results (dict) always include specific transit ip address in hop 7
       assert: 
         that:
-            - result_traceroute.hop_dict['7'] == ['72.14.202.237']
+            - result_traceroute.hop_dict['7'] == ['172.30.100.1']
 
     - name: check if the traceroute results (list) always include specific transit ip address in hop 7
       assert: 
         that:
             - result_traceroute.hop_list[6][0] == '7'
-            - result_traceroute.hop_list[6][1] == '72.14.202.237'
+            - result_traceroute.hop_list[6][1] == '172.30.100.1'
             - result_traceroute.hop_list[6][2] is not defined
 ```
 
