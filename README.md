@@ -23,11 +23,16 @@ Ansible ios_traceroute module for Cisco IOS
       debug: 
         msg: "{{ result_traceroute }}"
         
-    - name: check if the traceroute results always include specific transit ip address in hop 7
+    - name: check if the traceroute results (dict) always include specific transit ip address in hop 7
+      assert: 
+        that:
+            - result_traceroute.hop_dict['7'] == ['72.14.202.237']
+
+    - name: check if the traceroute results (list) always include specific transit ip address in hop 7
       assert: 
         that:
             - result_traceroute.hop_list[6][0] == '7'
-            - result_traceroute.hop_list[6][1] == '72.31.100.1'
+            - result_traceroute.hop_list[6][1] == '72.14.202.237'
             - result_traceroute.hop_list[6][2] is not defined
 ```
 
@@ -39,10 +44,10 @@ Ansible ios_traceroute module for Cisco IOS
 PLAY [cisco] **************************************************************************************************
 
 TASK [execute traceroute] *************************************************************************************
-ok: [192.168.100.201]
+ok: [test3]
 
 TASK [debug traceroute] ***************************************************************************************
-ok: [192.168.100.201] => {
+ok: [test3] => {
     "msg": {
         "changed": false,
         "commands": [
@@ -232,12 +237,18 @@ ok: [192.168.100.201] => {
     }
 }
 
-TASK [check if the traceroute results always include specific transit ip address in hop 7] ********************
-ok: [192.168.100.201] => {
+TASK [check if the traceroute results (dict) always include specific transit ip address in hop 7] *******************************
+ok: [test3] => {
     "changed": false,
     "msg": "All assertions passed"
 }
 
-PLAY RECAP ****************************************************************************************************
-192.168.151.3            : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+TASK [check if the traceroute results (list) always include specific transit ip address in hop 7] *******************************
+ok: [test3] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+PLAY RECAP **********************************************************************************************************************
+test3                      : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
