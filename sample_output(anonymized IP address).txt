@@ -128,13 +128,17 @@ ok: [192.168.100.201] => {
     }
 }
 
-TASK [check if the traceroute results always include specific transit ip address in hop 7] ********************
-ok: [192.168.100.201] => {
+TASK [check if the traceroute results (dict) always include specific transit ip address in hop 7] *******************************
+ok: [test3] => {
     "changed": false,
     "msg": "All assertions passed"
 }
 
-PLAY RECAP ****************************************************************************************************
-192.168.151.3            : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+TASK [check if the traceroute results (list) always include specific transit ip address in hop 7] *******************************
+ok: [test3] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
 
-
+PLAY RECAP **********************************************************************************************************************
+test3                      : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
