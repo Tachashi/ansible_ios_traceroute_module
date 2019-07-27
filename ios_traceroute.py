@@ -11,7 +11,7 @@ DOCUMENTATION = r'''
 module: ios_traceroute
 short_description: Identify the path used to reach the target from Cisco IOS network devices
 description:
-- By using traceroute command, ddentify the path used to reach the target
+- By using traceroute command, identify the path used to reach the target
 - from Cisco IOS network devices. 
 author:
 - Tachashi (@tech_kitara)
