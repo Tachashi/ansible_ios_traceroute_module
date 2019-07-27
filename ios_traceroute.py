@@ -131,8 +131,16 @@ def main():
         elif type(hop_result) is str and parse_result != []:
             parse_result[-1].append(hop_result)
 
+    parse_result_dict = {}
+
+    for ip_item in parse_result:
+        key = ip_item[0]
+        value = ip_item[1:]
+        parse_result_dict[key] = value
+
     results["output"] = trace_results_list
-    results["hop"] = parse_result
+    results["hop_list"] = parse_result
+    results["hop_dict"] = parse_result_dict
     module.exit_json(**results)
 
 
