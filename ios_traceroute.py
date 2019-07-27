@@ -72,8 +72,13 @@ output:
   description: Raw output of traceroute command.
   returned: always
   type: list
-hop:
-  description: IP addresses of each hops.
+hop_dict:
+  description: IP addresses of each hops (dict type).
+  returned: always
+  type: dict
+  sample: {"1": ["10.30.30.30"], "2": ["10.10.10.10", "10.20.20.20"], "3": ["10.40.40.40"]}
+hop_list:
+  description: IP addresses of each hops (list type).
   returned: always
   type: list
   sample: [["1", "10.30.30.30"], ["2", "10.10.10.10", "10.20.20.20"], ["3", "10.40.40.40"]]
