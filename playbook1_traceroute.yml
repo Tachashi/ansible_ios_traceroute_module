@@ -21,9 +21,9 @@
     - name: check if the traceroute results always include specific transit ip address in hop 7
       assert: 
         that:
-            - result_traceroute.hop[6][0] == '7'
-            - result_traceroute.hop[6][1] == '172.30.100.1'
-            - result_traceroute.hop[6][2] is not defined
+            - result_traceroute.hop_list[6][0] == '7'
+            - result_traceroute.hop_list[6][1] == '172.30.100.1'
+            - result_traceroute.hop_list[6][2] is not defined
 
 
 
