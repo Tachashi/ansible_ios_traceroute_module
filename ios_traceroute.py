@@ -12,7 +12,7 @@ module: ios_traceroute
 short_description: Identify the path used to reach the target from Cisco IOS network devices
 description:
 - By using traceroute command, identify the path used to reach the target
-- from Cisco IOS network devices. 
+- from Cisco IOS network devices.
 author:
 - Tachashi (@tech_kitara)
 version_added: '2.9'
@@ -47,14 +47,12 @@ EXAMPLES = r'''
 - name: Identify the path to 10.10.10.10 using default vrf
   ios_traceroute:
     dest: 10.10.10.10
-
 - name: Identify the path to 10.20.20.20 using prod vrf
-  ios_ping:
+  ios_traceroute:
     dest: 10.20.20.20
     vrf: prod
-
 - name: Identify the path to 10.40.40.40 from 10.30.30.30 with setting probe and ttl
-  ios_ping:
+  ios_traceroute:
     dest: 10.40.40.40
     source: 10.30.30.30
     probe: 5
@@ -72,16 +70,11 @@ output:
   description: Raw output of traceroute command.
   returned: always
   type: list
-hop_dict:
-  description: IP addresses of each hops (dict type).
+hop:
+  description: IP addresses of each hops.
   returned: always
   type: dict
   sample: {"1": ["10.30.30.30"], "2": ["10.10.10.10", "10.20.20.20"], "3": ["10.40.40.40"]}
-hop_list:
-  description: IP addresses of each hops (list type).
-  returned: always
-  type: list
-  sample: [["1", "10.30.30.30"], ["2", "10.10.10.10", "10.20.20.20"], ["3", "10.40.40.40"]]
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -140,12 +133,11 @@ def main():
 
     for ip_item in parse_result:
         key = ip_item[0]
-        value = ip_item[1:]
+        value = list(set(ip_item[1:]))
         parse_result_dict[key] = value
 
     results["output"] = trace_results_list
-    results["hop_list"] = parse_result
-    results["hop_dict"] = parse_result_dict
+    results["hop"] = parse_result_dict
     module.exit_json(**results)
 
 
@@ -164,7 +156,7 @@ def build_trace(module, dest, source=None, probe=None, port=None, ttl_min=None, 
         if arg:
             cmd += " {0} {1}".format(command, arg)
 
-    if ttl_min is not None and ttl_max is not None :
+    if ttl_min is not None and ttl_max is not None:
         cmd += " {0} {1} {2}".format("ttl", ttl_min, ttl_max)
 
     return cmd
@@ -181,7 +173,7 @@ def parse_trace(trace_line):
     for trace_num_item in trace_line_list[:3]:
         match_num = num_re.search(trace_num_item)
         if match_num:
-            break    
+            break
 
     if match_num:
         ip_list = [match_num.group()]
