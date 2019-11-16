@@ -1,10 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {}
+ANSIBLE_METADATA = {'metadata_version': '1.1',
+                    'status': ['preview'],
+                    'supported_by': 'network'}
 
 DOCUMENTATION = r'''
 ---
@@ -15,32 +18,38 @@ description:
 - from Cisco IOS network devices.
 author:
 - Tachashi (@tech_kitara)
-version_added: '2.9'
+version_added: '2.10'
 extends_documentation_fragment: ios
 options:
   probe:
     description:
     - Number of packets to send per hop.
+    type: int
   dest:
     description:
-    - The IP Address or hostname (resolvable by switch) of the remote node.
+    - The IP Address or hostname (resolvable by network device) of the remote node.
+    type: str
     required: true
   source:
     description:
     - The source IP Address.
-  port:
+    type: str
+  udp:
     description:
     - The port number of UDP packets to send.
+    type: int
   ttl_min:
     description:
     - The minimum time to live. (ttl_min and ttl_max options must be specified at the same time.)
+    type: int
   ttl_max:
     description:
     - The maximum time to live. (ttl_min and ttl_max options must be specified at the same time.)
+    type: int
   vrf:
     description:
     - The VRF to use for forwarding.
-    default: default
+    type: str
 '''
 
 EXAMPLES = r'''
@@ -79,7 +88,7 @@ hop:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.network.ios.ios import run_commands
-from ansible.module_utils.network.ios.ios import ios_argument_spec, check_args
+from ansible.module_utils.network.ios.ios import ios_argument_spec
 import re
 
 
@@ -90,10 +99,9 @@ def main():
         probe=dict(type="int"),
         dest=dict(type="str", required=True),
         source=dict(type="str"),
-        port=dict(type="int"),
+        udp=dict(type="int"),
         ttl_min=dict(type="int"),
         ttl_max=dict(type="int"),
-        state=dict(type="str", choices=["absent", "present"], default="present"),
         vrf=dict(type="str")
     )
 
@@ -104,19 +112,18 @@ def main():
     probe = module.params["probe"]
     dest = module.params["dest"]
     source = module.params["source"]
-    port = module.params["port"]
+    udp = module.params["udp"]
     ttl_min = module.params["ttl_min"]
     ttl_max = module.params["ttl_max"]
     vrf = module.params["vrf"]
 
     warnings = list()
-    check_args(module, warnings)
 
     results = {}
     if warnings:
         results["warnings"] = warnings
 
-    results["commands"] = [build_trace(module, dest, source, probe, port, ttl_min, ttl_max, vrf)]
+    results["commands"] = [build_trace(module, dest, source, probe, udp, ttl_min, ttl_max, vrf)]
 
     trace_results = run_commands(module, commands=results["commands"])
     trace_results_list = trace_results[0].split("\n")
@@ -124,9 +131,9 @@ def main():
     parse_result = []
     for trace_line in trace_results_list:
         hop_result = parse_trace(trace_line)
-        if type(hop_result) is list:
+        if isinstance(hop_result, list):
             parse_result.append(hop_result)
-        elif type(hop_result) is str and parse_result != []:
+        elif isinstance(hop_result, str) and parse_result != []:
             parse_result[-1].append(hop_result)
 
     parse_result_dict = {}
@@ -141,9 +148,9 @@ def main():
     module.exit_json(**results)
 
 
-def build_trace(module, dest, source=None, probe=None, port=None, ttl_min=None, ttl_max=None, vrf=None):
+def build_trace(module, dest, source=None, probe=None, udp=None, ttl_min=None, ttl_max=None, vrf=None):
     """
-    Function to build the command to send to the terminal for the switch
+    Function to build the command to send to the terminal for the network device
     to execute. All args come from the module's unique params.
     """
     if vrf is not None:
@@ -151,10 +158,13 @@ def build_trace(module, dest, source=None, probe=None, port=None, ttl_min=None, 
     else:
         cmd = "traceroute {0}".format(dest)
 
-    for command in ["source", "probe", "port"]:
+    for command in ["source", "probe"]:
         arg = module.params[command]
         if arg:
             cmd += " {0} {1}".format(command, arg)
+
+    if udp is not None:
+        cmd += " {0} {1}".format("port", udp)
 
     if ttl_min is not None and ttl_max is not None:
         cmd += " {0} {1} {2}".format("ttl", ttl_min, ttl_max)
@@ -180,12 +190,13 @@ def parse_trace(trace_line):
         for trace_item in trace_line_list:
             match_ip = ip_re.search(trace_item)
             if match_ip:
-                ip_list.append(match_ip.group())
+                ip_list.append(match_ip.group(0))
         return ip_list
     else:
-        match_ip = ip_re.search(trace_line_list[4])
-        if match_ip:
-            return match_ip.group()
+        for trace_item in trace_line_list:
+            match_ip = ip_re.search(trace_item)
+            if match_ip:
+                return match_ip.group(0)
 
 
 if __name__ == "__main__":
